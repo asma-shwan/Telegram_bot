@@ -1,22 +1,23 @@
 const TelegramBot = require('node-telegram-bot-api');
-const { message } = require('statuses');
-const keep_alive=require("./keep_alive")
-var cron = require('node-cron');
+const cron = require('node-cron');
+const { Telegraf } = require('telegraf');
 const knex = require('knex')({
     client: 'mysql',
     connection: {
-      host : 'sql12.freesqldatabase.com',
-      port : 3306,
-      user : 'sql12646778',
-      password : 'Dq3iWNQWgw',
-      database :'sql12646778'
+        host: 'sql12.freesqldatabase.com',
+        port: 3306,
+        user: 'sql12674680',
+        password: 'gEexpyHe2m',
+        database: 'sql12674680'
     }
-  });
-// replace the value below with the Telegram token you receive from @BotFather
+});
+
+
+
 const token = '6593628238:AAFLhehn4qrtPc6i7piFaE9a_uyxgZNIZtI';
-
-
+const bot2 = new Telegraf(token);
 const bot = new TelegramBot(token, {polling: true});
+
 bot.on('message', async (msg) => {
     const UserId = msg.from.id;
     const messageText = msg.text;
@@ -49,9 +50,9 @@ bot.on('message', async (msg) => {
 
         })
     }
+  })
 
-  });
-  cron.schedule('0 8 * * * ', () => {
+  cron.schedule('3 1 * * * ', () => {
      knex('Users')
     .select("Id")
     .then((users) => {
@@ -63,7 +64,7 @@ bot.on('message', async (msg) => {
       console.error(err);
     }) 
   });
-cron.schedule('0 17 * * * ', () => {
+cron.schedule('57 17 * * * ', () => {
     knex('Users')
    .select("Id")
    .then((users) => {
@@ -78,37 +79,26 @@ cron.schedule('0 17 * * * ', () => {
 
 
 async function fetchazkarsabah(id) {
-  try {
-    const response = await fetch('https://ahegazy.github.io/muslimKit/json/azkar_sabah.json');
-    const data = await response.json();
-    var azkarSabah = " ";
-    for (let i = 0; i < data.content.length; i++) {
-      azkarSabah = `${data.content[i].zekr}\n(${data.content[i].repeat})\n${data.content[i].bless}`;
-  bot.sendMessage(id,azkarSabah)
- }
-
-    
-  } catch (err) {
-    console.error(err);
-  }
+  let azkars=""
+    knex.select('*')
+    .from('Azkar_sabah')
+    .then((data)=>{
+     for(let i=0;i<data.length;i++){
+      azkars=`زکـــر: ${data[i].Azkars} \n دووبارەکردنەوە : ${data[i].repeat_azkars}`
+      bot.sendMessage(id,azkars)
+     }
+    })
+    .catch((err)=>{console.log(err)})
 }
-
 async function fetchazkarmassa(id) {
-  try {
-    const response = await fetch('https://ahegazy.github.io/muslimKit/json/azkar_massa.json');
-    const data = await response.json();
-    var azkarSabah = " ";
-    for (let i = 0; i < data.content.length; i++) {
-      azkarSabah = `${data.content[i].zekr}\n(${data.content[i].repeat})\n${data.content[i].bless}`;
-  bot.sendMessage(id,azkarSabah)
- }
-
-    
-  } catch (err) {
-    console.error(err);
-  }
+  let azkars=""
+    knex.select('*')
+    .from('Azkar_Massa')
+    .then((data)=>{
+     for(let i=0;i<data.length;i++){
+      azkars=`زکـــر: ${data[i].Azkars} \n دووبارەکردنەوە : ${data[i].repeat_azkars}`
+      bot.sendMessage(id,azkars)
+     }
+    })
+    .catch((err)=>{console.log(err)})
 }
-
-
-
-// bot.sendMessage(6219330995, 'Hello, this is a message from your Telegram bot.');
